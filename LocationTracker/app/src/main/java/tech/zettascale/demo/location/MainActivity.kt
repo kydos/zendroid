@@ -30,12 +30,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 import io.zenoh.Session
@@ -53,6 +55,7 @@ class MainActivity : ComponentActivity() {
 
     lateinit var lm: LocationManager
     lateinit var provider: String
+    var locationListener: LocationListener? = null
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -137,7 +140,7 @@ class MainActivity : ComponentActivity() {
         lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         provider = lm.allProviders.find { s -> s == "gps" } ?: "gps"
 
-        val locationListener: LocationListener =
+        locationListener =
             LocationListener { l ->
                 zpub.put(locationToCarData(l, model, color)).res()
                 Log.d("ZLocTracker", ">>>>>>>> Published Location: $l")
@@ -147,8 +150,12 @@ class MainActivity : ComponentActivity() {
         val t: Long = 1000
         val d: Float = 0f
 
-        lm.requestLocationUpdates(p, t, d, locationListener, Looper.getMainLooper())
-
+        lm.requestLocationUpdates(p, t, d, locationListener!!, Looper.getMainLooper())
+    }
+    fun stopLocationTracking() {
+        if (locationListener != null) {
+            lm.removeUpdates(locationListener!!)
+        }
     }
 
 }
@@ -194,14 +201,26 @@ fun Tracker(name: String, modifier: Modifier = Modifier, activity: MainActivity)
                 TextField(value = key, onValueChange = { s -> key = s}, enabled = !running)
             }
             Row(
-                horizontalArrangement = Arrangement.Absolute.Center
+                horizontalArrangement = Arrangement.Center
             ) {
-                Button(onClick = {
-                    running = true
-                    activity.startLocationTracking(locator, key, model, color)
-
-                }) {
+                Button(
+                    enabled = !running,
+                    colors = ButtonColors(Color.Green, Color.Black, Color.Gray, Color.Black),
+                    onClick = {
+                        running = true
+                        activity.startLocationTracking(locator, key, model, color)
+                    })
+                {
                     Text("Start")
+                }
+                Button(enabled = running,
+                    colors = ButtonColors(Color.Red, Color.Black, Color.Gray, Color.Black),
+                    onClick = {
+                        running = false
+                        activity.stopLocationTracking()
+                    }
+                ) {
+                    Text("Stop")
                 }
             }
         }
