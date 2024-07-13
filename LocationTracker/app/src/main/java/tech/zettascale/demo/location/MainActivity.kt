@@ -167,11 +167,16 @@ fun Tracker(name: String, modifier: Modifier = Modifier, activity: MainActivity)
     var color by remember { mutableStateOf("Black") }
     var key by remember { mutableStateOf("demo/vehicles/location") }
     var running by remember {mutableStateOf(false)}
-    Box(modifier = modifier) {
-        modifier.align(Alignment.Center)
-        Column(verticalArrangement = Arrangement.Bottom,) {
+    Box(modifier = modifier,
+        contentAlignment = Alignment.Center) {
+
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+            ) {
             Row(
                 Modifier.padding(20.dp),
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("PaaS:")
@@ -181,6 +186,7 @@ fun Tracker(name: String, modifier: Modifier = Modifier, activity: MainActivity)
             }
             Row(
                 Modifier.padding(20.dp),
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Model:")
@@ -188,6 +194,7 @@ fun Tracker(name: String, modifier: Modifier = Modifier, activity: MainActivity)
             }
             Row(
                 Modifier.padding(20.dp),
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Color:")
@@ -195,13 +202,15 @@ fun Tracker(name: String, modifier: Modifier = Modifier, activity: MainActivity)
             }
             Row(
                 Modifier.padding(20.dp),
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Key:")
                 TextField(value = key, onValueChange = { s -> key = s}, enabled = !running)
             }
             Row(
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
                     enabled = !running,
