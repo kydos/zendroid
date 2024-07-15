@@ -104,7 +104,6 @@ class MainActivity : ComponentActivity() {
         val config_json = """
          {
              "mode": "client",
-             "id":"f0",
              "connect": {
                  "endpoints": [
                      "${locator}"
