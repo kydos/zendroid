@@ -90,7 +90,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun locationToCarData(l: Location, model: String, color: String): String =
-        """{"position": {"lat": ${l.latitude},"lng": ${l.longitude}},"speed": ${l.speed},"color": "${color}","id": "${model}"}"""
+        // TODO: get kind from UI
+        """{"position": {"lat": ${l.latitude},"lng": ${l.longitude}},"kind":"motorbike", "speed": ${l.speed},"color": "${color}","id": "${model}"}"""
 
     @SuppressLint("MissingPermission")
     public fun startLocationTracking(
