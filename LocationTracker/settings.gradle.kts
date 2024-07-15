@@ -20,8 +20,8 @@ dependencyResolutionManagement {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/eclipse-zenoh/zenoh-kotlin")
             credentials {
-                username = "user"
-                password = "gh-token"
+                username = providers.gradleProperty("user").get()
+                password = providers.gradleProperty("token").get()
             }
         }
     }

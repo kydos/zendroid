@@ -45,7 +45,7 @@ import io.zenoh.Config
 import io.zenoh.keyexpr.KeyExpr
 import io.zenoh.keyexpr.intoKeyExpr
 import io.zenoh.prelude.*
-
+import io.zenoh.value.Value
 
 
 class MainActivity : ComponentActivity() {
@@ -90,15 +90,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun locationToCarData(l: Location, model: String, color: String): String =
-        """
-            "position": {
-                "lat": ${l.latitude},
-                "lng": ${l.longitude}
-            },
-            "speed": ${l.speed},
-            "color": "${color}"
-            "id": "${model}"            
-        """.trimIndent()
+        """{"position": {"lat": ${l.latitude},"lng": ${l.longitude}},"speed": ${l.speed},"color": "${color}","id": "${model}"}"""
 
     @SuppressLint("MissingPermission")
     public fun startLocationTracking(
@@ -110,6 +102,7 @@ class MainActivity : ComponentActivity() {
         val config_json = """
          {
              "mode": "client",
+             "id":"f0",
              "connect": {
                  "endpoints": [
                      "${locator}"
@@ -125,7 +118,7 @@ class MainActivity : ComponentActivity() {
 
         val kexpr = key.intoKeyExpr().getOrThrow()
 //        val c = Config.from(config_json)
-        val c = Config.default()
+        val c = Config.from(config_json)
         val z = Session.open(c).getOrThrow()
         val zpub = z.declarePublisher(kexpr)
             .congestionControl(CongestionControl.DROP)
@@ -142,7 +135,8 @@ class MainActivity : ComponentActivity() {
 
         locationListener =
             LocationListener { l ->
-                zpub.put(locationToCarData(l, model, color)).res()
+                var value = Value(locationToCarData(l, model, color), Encoding(KnownEncoding.APP_JSON, ""))
+                zpub.put(value).res()
                 Log.d("ZLocTracker", ">>>>>>>> Published Location: $l")
             }
 
@@ -162,7 +156,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Tracker(name: String, modifier: Modifier = Modifier, activity: MainActivity) {
-    var locator by remember { mutableStateOf("tcp//172.31.3.52:7447") }
+    var locator by remember { mutableStateOf("tcp/3.71.106.121:7447") }
     var model by remember { mutableStateOf("Ducati Scrambler 1100") }
     var color by remember { mutableStateOf("Black") }
     var key by remember { mutableStateOf("demo/vehicles/location") }

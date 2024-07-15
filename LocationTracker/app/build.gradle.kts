@@ -51,7 +51,7 @@ android {
 
 dependencies {
 
-    implementation("io.zenoh:zenoh-kotlin-android:1.0.0-dev")
+    implementation("io.zenoh:zenoh-kotlin-android:0.11.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
