@@ -129,7 +129,7 @@
              }
             """.trimIndent()
 
-            val kexpr = "/demo/tracker/${kind}".intoKeyExpr().getOrThrow()
+            val kexpr = "demo/tracker/${kind}".intoKeyExpr().getOrThrow()
             val c = Config.from(config_json)
             val z = Session.open(c).getOrThrow()
             val zpub = z.declarePublisher(kexpr)
