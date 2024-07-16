@@ -103,19 +103,16 @@
                 LOCATION_PERMISSION_REQUEST_CODE)
         }
 
-        private fun locationToCarData(l: Location, model: String, color: String, kind: String, driver: String): String =
+        private fun locationToCarData(l: Location, model: String, color: String, kind: String): String =
             // TODO: get kind from UI
-            """{"position": {"lat": ${l.latitude},"lng": ${l.longitude}},"kind":"motorbike", "speed": ${l.speed*3.6},"color": "${color}","id": "${model}", "kind": ${kind}, "driver": ${driver}} """
+            """{"position": {"lat": ${l.latitude},"lng": ${l.longitude}}, "speed": ${l.speed*3.6},"color": "${color}","id": "${model}", "kind": "${kind}"}"""
 
         @SuppressLint("MissingPermission")
         public fun startLocationTracking(
             locator: String,
-            key: String,
             model: String,
             color: String,
-            kind: String,
-            driver: String) {
-            Log.d("ZLocTracker", "[][][][][][]Starting Location Tracking for:\n $locator, $model, $color, $key")
+            kind: String, ) {
             val config_json = """
              {
                  "mode": "client",
@@ -132,7 +129,7 @@
              }
             """.trimIndent()
 
-            val kexpr = key.intoKeyExpr().getOrThrow()
+            val kexpr = "/demo/tracker/${kind}".intoKeyExpr().getOrThrow()
             val c = Config.from(config_json)
             val z = Session.open(c).getOrThrow()
             val zpub = z.declarePublisher(kexpr)
@@ -150,7 +147,7 @@
 
             locationListener =
                 LocationListener { l ->
-                    var value = Value(locationToCarData(l, model, color, kind, driver), Encoding(KnownEncoding.APP_JSON, ""))
+                    var value = Value(locationToCarData(l, model, color, kind), Encoding(KnownEncoding.APP_JSON, ""))
                     zpub.put(value).res()
                     Log.d("ZLocTracker", ">>>>>>>> Published Location: $l")
                 }
@@ -174,10 +171,8 @@
         var locator by remember { mutableStateOf("tcp/3.71.106.121:7447") }
         var model by remember { mutableStateOf("Ducati Scrambler 1100") }
         var color by remember { mutableStateOf("Black") }
-        var key by remember { mutableStateOf("demo/vehicles/location") }
         var running by remember {mutableStateOf(false)}
-        var kind by remember {mutableStateOf("motorcycle")}
-        var driver by remember {mutableStateOf("Angelo")}
+        var kind by remember {mutableStateOf("motorbike")}
         Box(modifier = modifier,
             contentAlignment = Alignment.Center) {
 
@@ -216,24 +211,8 @@
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Key:")
-                    TextField(value = key, onValueChange = { s -> key = s}, enabled = !running)
-                }
-                Row(
-                    Modifier.padding(20.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
                     Text("kind:")
                     TextField(value = kind, onValueChange = { s -> kind = s}, enabled = !running)
-                }
-                Row(
-                    Modifier.padding(20.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Driver:")
-                    TextField(value = driver, onValueChange = { s -> driver = s}, enabled = !running)
                 }
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -244,7 +223,7 @@
                         colors = ButtonColors(Color.Green, Color.Black, Color.Gray, Color.Black),
                         onClick = {
                             running = true
-                            activity.startLocationTracking(locator, key, model, color, kind, driver)
+                            activity.startLocationTracking(locator, model, color, kind)
                         })
                     {
                         Text("Start")
